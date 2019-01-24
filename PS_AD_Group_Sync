@@ -1,0 +1,21 @@
+$GroupName="MC-GC-Students-Test"
+$currentTerm="1198"
+$DomainDN=(Get-ADDomain).distinguishedName
+$members = Get-ADGroup $GroupName -pr members | select -ExpandProperty members
+$users=get-aduser -Filter {employeeType -eq "S"} -Properties extensionattribute2,employeeType -SearchBase "OU=Users,OU=Student,$DomainDN"
+
+foreach ($User in $Users)
+    {
+    If (($User.extensionattribute2 -eq $CurrentTerm) -and ($members -notcontains $User.DistinguishedName))
+        {
+        Add-ADGroupMember $GroupName -Members $user
+        }
+    Elseif (($User.extensionattribute2 -ne $CurrentTerm) -and ($members -contains $User.DistinguishedName))
+        {
+        Remove-ADGroupMember $GroupName -Members $user -Confirm:$false
+        }
+    Else
+        {
+        "Nothing to do"
+        }
+    }
